@@ -64,4 +64,21 @@ public class TaskController {
 
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable UUID id, HttpServletRequest request) {
+        var task = this.taskRepository.findById(id).orElse(null);
+        if (task == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task não encontrada");
+        }
+
+        var idUser = (UUID) request.getAttribute("idUser");
+        if (!task.getIdUser().equals(idUser)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário não autorizado!");
+        }
+
+        this.taskRepository.deleteById(id);
+        return ResponseEntity.ok().body("Task deletada com sucesso");
+    }
+
+
 }
